@@ -1,6 +1,6 @@
 
 The running total (or cumulative sum) of a column helps you determine what each row's contribution is to the total sum.
-
+SUM;
 Return the athletes, the number of medals they earned, and the medals running total, ordered by the athletes' names in alphabetical order.
 
 
@@ -20,3 +20,26 @@ SELECT
   SUM(medals) OVER (ORDER BY athlete ASC) AS Max_Medals
 FROM Athlete_Medals
 ORDER BY Athlete ASC;
+
+-----------------------------------------------------------
+NOW WITH MAX :
+Return the year, country, medals, and the maximum medals earned so far for each country, ordered by year in ascending order.
+
+WITH Country_Medals AS (
+  SELECT
+    Year, Country, COUNT(*) AS Medals
+  FROM Summer_Medals
+  WHERE
+    Country IN ('CHN', 'KOR', 'JPN')
+    AND Medal = 'Gold' AND Year >= 2000
+  GROUP BY Year, Country)
+
+SELECT
+  -- Return the max medals earned so far per country
+  Year,
+  Medals,
+  Country,
+  MAX(medals) OVER (PARTITION BY country
+                ORDER BY Year ASC) AS Max_Medals
+FROM Country_Medals
+ORDER BY Country ASC, Year ASC;
