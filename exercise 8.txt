@@ -1,0 +1,33 @@
+Pivoting with ranking
+You want to produce an easy scannable table of the rankings of the three most populous EU countries by how many gold medals they've earned in the 2004 through 2012 Olympic games. The table needs to be in this format:
+
+| Country | 2004 | 2008 | 2012 |
+|---------|------|------|------|
+| FRA     | ...  | ...  | ...  |
+| GBR     | ...  | ...  | ...  |
+| GER     | ...  | ...  | ...  |
+
+You'll need to count the gold medals each country has earned, produce the ranks of each country by medals earned, then pivot the table to this shape.
+Select the country and year columns, then rank the three countries by how many gold medals they earned per year.
+
+
+WITH Country_Awards AS (
+  SELECT
+    Country,
+    Year,
+    COUNT(*) AS Awards
+  FROM Summer_Medals
+  WHERE
+    Country IN ('FRA', 'GBR', 'GER')
+    AND Year IN (2004, 2008, 2012)
+    AND Medal = 'Gold'
+  GROUP BY Country, Year)
+
+SELECT
+  -- Select Country and Year
+  Country,
+  year,
+  -- Rank by gold medals earned per year
+  RANK() OVER (PARTITION BY year ORDER BY Awards DESC) :: INTEGER AS rank
+FROM Country_Awards
+ORDER BY Country ASC, Year ASC;
