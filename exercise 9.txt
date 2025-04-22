@@ -1,0 +1,62 @@
+# Fintech SQL Project – User Analytics with PostgreSQL
+
+## Overview
+This project showcases a beginner-to-intermediate level SQL analysis task using a fictional fintech database. The goal is to identify the **top 5 high-value users** based on their total transaction amounts, account types, and location.
+
+## Objective
+> "Write a SQL query that returns the top 5 users with the highest total transaction values, including the number of transactions, their account type, and their city."
+
+## Tables Used
+- `users` – contains user profile data
+- `accounts` – contains account details per user
+- `transactions` – records of financial transactions
+
+## Output Columns
+- `full_name`
+- `account_type`
+- `city`
+- `total_transactions` – number of transactions per user
+- `total_spent` – sum of transaction amounts (including negative values)
+
+## SQL Concepts Used
+- JOINs across multiple tables
+- GROUP BY and aggregation
+- COUNT and SUM
+- ORDER BY and LIMIT
+- Aliases and clean output formatting
+
+## SQL Query
+```sql
+SELECT 
+  u.full_name,
+  u.city,
+  a.account_type,
+  COUNT(t.transaction_id) AS total_transactions,
+  SUM(t.amount) AS total_spent
+FROM users AS u
+JOIN accounts AS a ON u.user_id = a.user_id
+JOIN transactions AS t ON a.account_id = t.account_id
+GROUP BY u.user_id, u.full_name, u.city, a.account_type
+ORDER BY total_spent DESC
+LIMIT 5;
+```
+
+## Query Result
+
+| full_name         | account_type | city     | total_transactions | total_spent |
+|-------------------|--------------|----------|---------------------|-------------|
+| Mohammad Jafari   | Savings      | Tabriz   | 1                   | 1000000.00  |
+| Hossein Mohammadi | Savings      | Mashhad  | 1                   | 250000.00   |
+| Ali Rezaei        | Savings      | Tehran   | 2                   | 100000.00   |
+| Fatemeh Karimi    | Joint        | Isfahan  | 1                   | -300000.00  |
+| Sara Ahmadi       | Current      | Shiraz   | 1                   | -500000.00  |
+
+
+## Tech Stack
+- PostgreSQL
+- pgAdmin 4
+
+---
+
+## Notes
+This project is part of my journey to master SQL and data analysis. It simulates a realistic scenario for fintech businesses looking to identify valuable users.
