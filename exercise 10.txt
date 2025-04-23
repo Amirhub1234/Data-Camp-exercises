@@ -1,0 +1,113 @@
+
+# Fintech SQL Project – Intermediate User Analytics with PostgreSQL
+
+## Overview
+This project is part of a simulated Fintech analytics scenario where SQL is used to extract insights from user, transaction, and account data. It combines intermediate-level SQL skills such as JOINs, GROUP BY, subqueries, conditional logic (CASE), and date aggregation.
+
+## Tasks and Solutions
+
+### 1. Loyal Users – High Activity and Spending
+**Goal:** Identify users with more than 1 transaction and a total amount spent greater than 100,000.
+
+```sql
+SELECT 
+  u.full_name,
+  COUNT(t.transaction_id) AS total_transactions,
+  SUM(t.amount) AS total_spent
+FROM users u
+JOIN accounts a ON u.user_id = a.user_id
+JOIN transactions t ON a.account_id = t.account_id
+GROUP BY u.user_id, u.full_name
+HAVING COUNT(t.transaction_id) > 1 AND SUM(t.amount) > 100000;
+```
+
+**Explanation:** This query filters "loyal" users using GROUP BY and HAVING for conditional aggregation.
+
+---
+
+### 2. Monthly Revenue Report
+**Goal:** Show the company's total revenue (SUM of all transactions) grouped by month.
+
+```sql
+SELECT 
+  DATE_TRUNC('month', transaction_date) AS month,
+  SUM(amount) AS total_income
+FROM transactions
+GROUP BY DATE_TRUNC('month', transaction_date)
+ORDER BY month;
+```
+
+**Explanation:** `DATE_TRUNC` helps normalize dates to month level for grouping and time series reporting.
+
+---
+
+### 3. Account Type Performance
+**Goal:** Show average and count of transactions for each account type.
+
+```sql
+SELECT 
+  a.account_type,
+  COUNT(t.transaction_id) AS num_transactions,
+  ROUND(AVG(t.amount), 2) AS avg_amount
+FROM accounts a
+JOIN transactions t ON a.account_id = t.account_id
+GROUP BY a.account_type;
+```
+
+**Explanation:** Demonstrates use of AVG and COUNT along with GROUP BY on categorical variables.
+
+---
+
+### 4. Inactive Users – No Transactions
+**Goal:** Find users who have never made any transactions.
+
+```sql
+SELECT u.full_name, u.email
+FROM users u
+WHERE u.user_id NOT IN (
+  SELECT DISTINCT user_id FROM transactions
+);
+```
+
+**Explanation:** Uses a subquery to exclude all users that appear in the `transactions` table.
+
+---
+
+### 5. User Segmentation by Spending
+**Goal:** Categorize users into 'Gold', 'Silver', or 'Bronze' based on total spending.
+
+```sql
+SELECT 
+  u.full_name,
+  SUM(t.amount) AS total_spent,
+  CASE 
+    WHEN SUM(t.amount) > 500000 THEN 'Gold'
+    WHEN SUM(t.amount) BETWEEN 100000 AND 500000 THEN 'Silver'
+    ELSE 'Bronze'
+  END AS user_level
+FROM users u
+JOIN accounts a ON u.user_id = a.user_id
+JOIN transactions t ON a.account_id = t.account_id
+GROUP BY u.user_id, u.full_name;
+```
+
+**Explanation:** `CASE` logic allows custom labels for data ranges — great for user tiering.
+
+---
+
+## Tech Stack
+- SQL (PostgreSQL)
+- pgAdmin 4
+
+## Skills Demonstrated
+- Multi-table JOINs
+- Aggregation with SUM, COUNT, AVG
+- Subqueries (`NOT IN`)
+- Conditional Logic with `CASE`
+- Temporal Grouping (`DATE_TRUNC`)
+- Reporting and business intelligence logic
+
+---
+
+## Note
+This project simulates a real-world analyst task in the Fintech sector. The queries can be reused in dashboards or monthly automated reports.
